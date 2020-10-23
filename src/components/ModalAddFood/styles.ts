@@ -5,12 +5,30 @@ export const Form = styled(Unform)`
   padding: 48px 40px;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   h1 {
     font-weight: 600;
     font-size: 36px;
     line-height: 36px;
     margin-bottom: 40px;
+  }
+
+  strong {
+    color: #fff;
+    color: #c53030;
+
+    position: absolute;
+    margin-top: 40px;
+
+    display: flex;
+    align-items:center;
+    justify-content: center;
+
+    svg {
+      margin-right: 5px;
+      color: #c53030;
+    }
   }
 
   button {

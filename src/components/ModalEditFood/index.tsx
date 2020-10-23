@@ -1,10 +1,14 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 
-import { FiCheckSquare } from 'react-icons/fi';
+import { FiCheckSquare, FiFrown } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from './styles';
 import Modal from '../Modal';
 import Input from '../Input';
+
+import * as Yup from 'yup';
+
+import getValidationErrors from '../../utils/getValidationErrors'
 
 interface IFoodPlate {
   id: number;
@@ -37,9 +41,52 @@ const ModalEditFood: React.FC<IModalProps> = ({
 }) => {
   const formRef = useRef<FormHandles>(null);
 
+  const [unexpectedError, setUnexpectedError] = useState('');
+
   const handleSubmit = useCallback(
     async (data: IEditFoodData) => {
-      // EDIT A FOOD PLATE AND CLOSE THE MODAL
+
+      try {
+        if (formRef.current) formRef.current.setErrors({});
+        setUnexpectedError('');
+
+        const schema = Yup.object().shape({
+          image: Yup.string()
+            .required('Link de imagem obrigatório')
+            .url('Link de imagem inválido'),
+          name: Yup.string()
+            .required('Nome obrigatório'),
+          price: Yup.number()
+            .required('Preço obrigatório')
+            .typeError('O preço deve ser um número'),
+          description: Yup.string().required('Descrição obrigatória'),
+        });
+
+        await schema.validate(data, { abortEarly: false });
+
+        handleUpdateFood(data);
+
+        setIsOpen()
+
+      } catch(err) {
+        let description = '';
+
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+
+          if (formRef.current) {
+            formRef.current.setErrors(errors);
+
+            return;
+          }
+        }
+
+        if (err instanceof Error) {
+          description = err.message;
+        }
+
+        setUnexpectedError(description);
+      }
     },
     [handleUpdateFood, setIsOpen],
   );
@@ -48,6 +95,14 @@ const ModalEditFood: React.FC<IModalProps> = ({
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
       <Form ref={formRef} onSubmit={handleSubmit} initialData={editingFood}>
         <h1>Editar Prato</h1>
+
+        {unexpectedError &&
+          <strong>
+            <FiFrown size={20} />
+            Desculpe. Aconteceu um erro. Tente adicionar o prato novamente.
+          </strong>
+        }
+
         <Input name="image" placeholder="Cole o link aqui" />
 
         <Input name="name" placeholder="Ex: Moda Italiana" />

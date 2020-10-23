@@ -13,6 +13,23 @@ export const Form = styled(Unform)`
     margin-bottom: 40px;
   }
 
+  strong {
+    color: #fff;
+    color: #c53030;
+
+    position: absolute;
+    margin-top: 40px;
+
+    display: flex;
+    align-items:center;
+    justify-content: center;
+
+    svg {
+      margin-right: 5px;
+      color: #c53030;
+    }
+  }
+
   button {
     margin-top: 48px;
     align-self: flex-end;
